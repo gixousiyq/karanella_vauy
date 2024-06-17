@@ -15,6 +15,11 @@ jobs:
       - name: Cleanup
         run: rm -rf ${{ github.workspace }}/*
 
+      - name: Set swap to 20G
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: 20
+
       - name: Clone kernel source
         run: git clone https://github.com/Marius586/kernel_vayu -b main --depth=1 .
 
