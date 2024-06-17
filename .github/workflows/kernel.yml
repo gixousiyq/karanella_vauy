@@ -1,0 +1,37 @@
+name: Build and Release Kernel
+
+on:
+  workflow_dispatch:
+
+jobs:
+  Kernel:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+       shell: bash
+       working-directory: ${{ github.workspace }}
+
+    steps:
+      - name: Cleanup
+        run: rm -rf ${{ github.workspace }}/*
+
+      - name: Clone kernel source
+        run: git clone https://github.com/Marius586/kernel_vayu -b main --depth=1 .
+
+      - name: Start Compilation
+        run: bash compile.sh
+
+      - name: Set-up files
+        run: |
+          # Set-up files info
+            zip_file=$(find $HOME -name 'kernel*.zip' -print -quit)
+            echo "ZIP_FILE=$zip_file" >> $GITHUB_ENV
+            echo "ZIP_NAME=$(basename "$zip_file" .zip)" >> $GITHUB_ENV
+
+      - name: Upload files to repository releases page
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            ${{ env.ZIP_FILE }}
+          name: ${{ env.ZIP_NAME }}
+          tag_name: ${{ github.run_id }}
